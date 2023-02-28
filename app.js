@@ -1,3 +1,4 @@
+import bodyParser from 'body-parser';
 import express from 'express';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
@@ -8,6 +9,7 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+app.use(bodyParser.urlencoded({extended: false}));
 
 // M-Pesa Express API endpoints
 const darajaUrl = process.env.DARAJA_CREDENTIAL_URL;
@@ -47,17 +49,18 @@ app.post('/mpesa', async (req, res) => {
     
     // Generate M-Pesa Express request
     const data = {
-      BusinessShortCode: 174379,
+      BusinessShortCode: BusinessShortCode,
       TransactionType: "CustomerPayBillOnline",
-      Amount: 1,
-      PartyA: 254708374149,
-      PartyB: 174379,
-      PhoneNumber: 254708374149,
-      CallBackURL: 'https://mydomain.com/path',
-      AccountReference: 'CompanyXLTD',
-      TransactionDesc:'Payment of X'
+      Amount: req.body.amount,
+      PartyA: req.body.phoneNumber,
+      PartyB: BusinessShortCode,
+      PhoneNumber: req.body.phoneNumber,
+      CallBackURL: CallbackUrl,
+      AccountReference: 'Safari',
+      TransactionDesc:'Payment of safari services'
     };
     
+    console.log(JSON.stringify(data));
     const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3);
     const password = new Buffer.from(`${BusinessShortCode}${Passkey}${timestamp}`).toString('base64');
     const headers = {
